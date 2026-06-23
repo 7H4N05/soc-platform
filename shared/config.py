@@ -21,7 +21,10 @@ API_HOST = os.getenv("API_HOST", "168.144.73.18")
 API_PORT = int(os.getenv("API_PORT", "8000"))
 
 # --- Database ---
-DB_PATH = os.getenv("DB_PATH", str(BASE_DIR / "soc_platform.db"))        # SQLite file path
+if os.getenv("VERCEL"):
+    DB_PATH = os.getenv("DB_PATH", "/tmp/soc_platform.db")
+else:
+    DB_PATH = os.getenv("DB_PATH", str(BASE_DIR / "soc_platform.db"))        # SQLite file path
 
 # --- Agent ---
 AGENT_SEND_INTERVAL = int(os.getenv("AGENT_SEND_INTERVAL", "2"))            # Seconds between log batches

@@ -426,7 +426,18 @@
 <body>
   <div id="root"></div>
 
-<script type="text/babel">
+<script>
+  console.log("Checking script loads:");
+  console.log("React:", typeof React !== 'undefined' ? 'Loaded' : 'FAILED');
+  console.log("ReactDOM:", typeof ReactDOM !== 'undefined' ? 'Loaded' : 'FAILED');
+  console.log("Babel:", typeof Babel !== 'undefined' ? 'Loaded' : 'FAILED');
+  window.addEventListener('error', function(e) {
+    console.error("GLOBAL ERROR CAPTURED:", e.message, "in", e.filename, "line", e.lineno);
+  });
+</script>
+
+<script type="text/plain" id="my-jsx-code">
+  console.log("Babel JSX script started compilation and execution");
   const { useState, useEffect, useRef, useMemo, useCallback } = React;
   const API_BASE = '/api';
 
@@ -1005,6 +1016,35 @@
   }
 
   ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+<script>
+  (function() {
+    function compileAndRun() {
+      try {
+        const codeElement = document.getElementById('my-jsx-code');
+        if (!codeElement) return;
+        const code = codeElement.textContent;
+        console.log("Manually compiling JSX...");
+        const transpiled = Babel.transform(code, {
+          presets: [
+            ['react', { runtime: 'classic' }]
+          ]
+        }).code;
+        const script = document.createElement('script');
+        script.text = transpiled;
+        document.body.appendChild(script);
+        console.log("Transpiled JSX successfully executed!");
+      } catch (err) {
+        console.error("Manual JSX compilation/execution failed:", err);
+      }
+    }
+    if (typeof Babel !== 'undefined') {
+      compileAndRun();
+    } else {
+      window.addEventListener('load', compileAndRun);
+    }
+  })();
 </script>
 </body>
 </html>
